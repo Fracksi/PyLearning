@@ -48,9 +48,6 @@ def macSwitcharoo(userInterface, newMacAddr):
   subprocess.call(["ip", "link", "set", userInterface, "address", newMacAddr])
   subprocess.call(["ip", "link", "set", userInterface, "up"])
 
-  # Checks
-  #subprocess.call(["ip", "addr", "show", userInterface])
-
 
 def main():
   # Grabs what to send from function above, basic error handling.
