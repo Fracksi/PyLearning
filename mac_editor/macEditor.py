@@ -6,11 +6,11 @@ import optparse
 
 def macSwitcharoo(userInterface, newMacAddr):
   # Print output overview
-  print("[+] Changing MAC Address for " + userInterface + " to " + newMacAddress)
+  print("[+] Changing MAC Address for " + userInterface + " to " + newMacAddr)
 
   # Make system calls
   subprocess.call(["ip", "link", "set", userInterface, "down"])
-  subprocess.call(["ip", "link", "set", userInterface, "address", newMacAddress])
+  subprocess.call(["ip", "link", "set", userInterface, "address", newMacAddr])
   subprocess.call(["ip", "link", "set", userInterface, "up"])
 
   # Checks
