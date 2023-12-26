@@ -32,7 +32,7 @@ def macSwitcharoo(userInterface, newMacAddr):
   subprocess.call(["ip", "link", "set", userInterface, "up"])
 
   # Checks
-  subprocess.call(["ip", "addr"])
+  subprocess.call(["ip", "addr", "show", userInterface])
 
 
 def main():
