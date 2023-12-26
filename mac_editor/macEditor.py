@@ -3,6 +3,7 @@
 
 import subprocess
 import optparse
+import re
 
 
 def argumentGrabbing():
@@ -22,6 +23,22 @@ def argumentGrabbing():
   return options
 
 
+def getCurrentMac(userInterface):
+  # Prints the ip addr show for the userinterface
+  rsltchk = subprocess.check_output(["ip","addr","show", userInterface])
+
+  # Thanking IBM for their regex while I still pick up the flow
+  # Snatches (unfortunately) all the MACs (for now). ifconfig has only the one but some low package installs
+  # -- I've made include ip suite over ifconfig now. No respect for the OGs.
+  macRegexSearch = re.search(r"((?:[0-9a-fA-F]{2}\:){5}[0-9a-fA-F]{2})", str(rsltchk))
+
+  #Sends back the first MAC found
+  if macRegexSearch:
+    return macRegexSearch.group(0)
+  else:
+    print("[-] MAC could not be read.")
+
+
 def macSwitcharoo(userInterface, newMacAddr):
   # Print output overview
   print("[+] Changing MAC Address for " + userInterface + " to " + newMacAddr)
@@ -32,16 +49,26 @@ def macSwitcharoo(userInterface, newMacAddr):
   subprocess.call(["ip", "link", "set", userInterface, "up"])
 
   # Checks
-  subprocess.call(["ip", "addr", "show", userInterface])
+  #subprocess.call(["ip", "addr", "show", userInterface])
 
 
 def main():
   # Grabs what to send from function above, basic error handling.
   options = argumentGrabbing()
 
-  # Sticks the info the script wants into the function.
+  # Grabs current MAC and prints it, passes stampedMac as a string in case print() doesn't approve of combo
+  stampedMac = getCurrentMac(options.userInterface)
+  print("[$] Current MAC is: " + str(stampedMac))
+
+  # Sticks the info the script wants into the function to change MAC
   macSwitcharoo(options.userInterface,options.newMacAddr)
 
+  # Comment placeholder
+  stampedMac = getCurrentMac(options.userInterface)
+  if stampedMac == options.newMacAddr:
+    print("[+] MAC Address changed to: " + stampedMac)
+  else:
+    print("[-] MAC Address was not changed.")
 
 # Technically more proper since this isn't imported.
 if __name__ == '__main__':
