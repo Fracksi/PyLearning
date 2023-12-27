@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+
+import scapy.all as sc
+
+
+ # Performs ARP scan on provided IP.
+def scan(ip):
+  requestArp = sc.ARP(pdst=ip)
+  broadOut = sc.Ether(dst="ff:ff:ff:ff:ff:ff")
+  requestArpBroad = broadOut / requestArp
+  helloNeighbor, voidSent = sc.srp(requestArpBroad, timeout=3)
+  print(helloNeighbor.summary())
+
+
+scan("192.168.1.1/24")
