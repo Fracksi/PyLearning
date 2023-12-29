@@ -1,31 +1,59 @@
 #!/usr/bin/env python
 
 import scapy.all as sc
+import optparse
+
+
+def argumentGrabbing():
+  # Loads child for OptionsParser and assigns basic inline flags
+  parser = optparse.OptionParser()
+  parser.add_option("-t", "--target", dest="ipRange", help="The IP network to scan, ex. 10.3.2.1/24")
+
+  # Method that returns the options from the args
+  (options, arguments) = parser.parse_args()
+
+  #Basic error handling if -t isn't provided.
+  if not options.ipRange:
+    parser.error("[-] IP Range not included, use --help for more info.")
+  return options
 
 
 # Function scan scan's the network and prints the results.
-def scan(ip):
+def scan(ipRange):
   # Sets the ARP request and the broadcast MAC to be sent to the network
-  requestArp = sc.ARP(pdst=ip)
+  requestArp = sc.ARP(pdst=ipRange)
   broadOut = sc.Ether(dst="ff:ff:ff:ff:ff:ff")
   requestArpBroad = broadOut / requestArp
 
   # srp returns two lists, answered and unanswered. We only want the answered list, so we use [0]
-  helloNeighborArray = sc.srp(requestArpBroad, timeout=3, verbose=False)[0]
+  helloNeighborArray = sc.srp(requestArpBroad, timeout=1, verbose=False)[0]
 
-  # Prints the results of the scan
-  print("IP \t\t\tMAC")
-  print("-----------------------------------")
+  # Convert the list from the scan to a list of dictionaries
   endpointList = []
-  for p in helloNeighborArray:
-    endpointDict = {"ip":p[1].psrc, "mac":p[1].hwsrc}
+  for endpoints in helloNeighborArray:
+    endpointDict = {"ip":endpoints[1].psrc, "mac":endpoints[1].hwsrc}
     endpointList.append(endpointDict)
-    print(p[1].psrc + "\t" + p[1].hwsrc)
-  print ("Total number of endpoints found: " + str(len(endpointList)))
+  return endpointList
+
+# Takes the list of endpoints as input and prints them
+def printScanResult(scanResultsList):
+  print("IP \t\t\tMAC\n-----------------------------------")
+  for endpoints in scanResultsList:
+    print(endpoints["ip"] + "\t\t" + endpoints["mac"])
+
 
 # Function main calls the scan function
 def main():
-  scan("10.3.172.1/24")
+  # Grabs what to send from function above, basic error handling.
+  options = argumentGrabbing()
+
+  # takes the ip range and sends it to the scan function
+  scanList = scan(options.ipRange)
+  print("\n[~] Scanning in range: " + options.ipRange)
+  print("[+]Total number of endpoints found: " + str(len(scanList))+"\n")
+
+  # Prints the results of the scan
+  printScanResult(scanList)
 
 
 # Calling the main function if the script is run directly
