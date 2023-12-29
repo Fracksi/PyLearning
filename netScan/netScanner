@@ -3,13 +3,31 @@
 import scapy.all as sc
 
 
- # Performs ARP scan on provided IP.
+# Function scan scan's the network and prints the results.
 def scan(ip):
+  # Sets the ARP request and the broadcast MAC to be sent to the network
   requestArp = sc.ARP(pdst=ip)
   broadOut = sc.Ether(dst="ff:ff:ff:ff:ff:ff")
   requestArpBroad = broadOut / requestArp
-  helloNeighbor, voidSent = sc.srp(requestArpBroad, timeout=3)
-  print(helloNeighbor.summary())
+
+  # srp returns two lists, answered and unanswered. We only want the answered list, so we use [0]
+  helloNeighborArray = sc.srp(requestArpBroad, timeout=3, verbose=False)[0]
+
+  # Prints the results of the scan
+  print("IP \t\t\tMAC")
+  print("-----------------------------------")
+  endpointList = []
+  for p in helloNeighborArray:
+    endpointDict = {"ip":p[1].psrc, "mac":p[1].hwsrc}
+    endpointList.append(endpointDict)
+    print(p[1].psrc + "\t" + p[1].hwsrc)
+  print ("Total number of endpoints found: " + str(len(endpointList)))
+
+# Function main calls the scan function
+def main():
+  scan("10.3.172.1/24")
 
 
-scan("192.168.1.1/24")
+# Calling the main function if the script is run directly
+if __name__ == "__main__":
+  main()
