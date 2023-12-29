@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 import scapy.all as sc
-import optparse
+import argparse
 
 
 def argumentGrabbing():
   # Loads child for OptionsParser and assigns basic inline flags
-  parser = optparse.OptionParser()
-  parser.add_option("-t", "--target", dest="ipRange", help="The IP network to scan, ex. 10.3.2.1/24")
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-t", "--target", dest="ipRange", help="The IP network to scan, ex. 10.3.2.1/24")
 
   # Method that returns the options from the args
-  (options, arguments) = parser.parse_args()
+  options= parser.parse_args()
 
   #Basic error handling if -t isn't provided.
   if not options.ipRange:

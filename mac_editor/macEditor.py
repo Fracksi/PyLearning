@@ -2,18 +2,18 @@
 
 
 import subprocess
-import optparse
+import argparse
 import re
 
 
 def argumentGrabbing():
   # Loads child for OptionsParser and assigns basic inline flags
-  parser = optparse.OptionParser()
-  parser.add_option("-i", "--interface", dest="userInterface", help="Interface where the MAC is changed.")
-  parser.add_option("-m", "--mac", dest="newMacAddr", help="New MAC being assigned.")
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-i", "--interface", dest="userInterface", help="Interface where the MAC is changed.")
+  parser.add_argument("-m", "--mac", dest="newMacAddr", help="New MAC being assigned.")
 
   # Method that returns the options from the args
-  (options, arguments) = parser.parse_args()
+  options = parser.parse_args()
 
   #Basic error handling if -i or -m aren't provided.
   if not options.userInterface:
